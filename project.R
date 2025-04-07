@@ -1,1 +1,2 @@
-testing = 1
+data = read.csv("~/Desktop/oasis_longitudinal.csv")
+
