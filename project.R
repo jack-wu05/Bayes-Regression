@@ -1,2 +1,2 @@
-data = read.csv("~/Desktop/oasis_longitudinal.csv")
+data = read.csv("~/Desktop/447 project/oasis_longitudinal.csv")
 
