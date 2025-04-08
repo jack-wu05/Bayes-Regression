@@ -18,7 +18,7 @@ fit = stan(
     N = nrow(data),
     S = length(unique(data$Subject.ID)),
     
-    subject = data$index,
+    subject = data$index, 
     Age = data$Age,
     SES = data$SES,
     EDUC = data$EDUC,
@@ -30,6 +30,7 @@ fit = stan(
 )
 
 print(fit)
+print(1)
 
 pdf("traceplot.pdf")
 traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC"))
