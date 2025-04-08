@@ -15,7 +15,7 @@ fit = stan(
   seed = 123,
   file = "stan_code.stan", 
   data = list (
-    N = 373,
+    N = nrow(data),
     S = length(unique(data$Subject.ID)),
     
     subject = data$index,

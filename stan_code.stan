@@ -43,16 +43,16 @@ model {
   beta_EDUC ~ normal(1,5);
   beta_Group ~ normal(1,5);
   
-  alpha ~ normal(delta_1, sigma_1);
-  gamma ~ normal(delta_2, sigma_2);
+  alpha_i ~ normal(delta_1, sigma_1);
+  gamma_i ~ normal(delta_2, sigma_2);
   
   for (i in 1:N) {
     real mu = beta_Age*Age[i] + 
               beta_SES*SES[i] + 
               beta_EDUC*EDUC[i] + 
               beta_Group*Group[i] + 
-              alpha[subject[i]] + 
-              gamma[subject[i]]*Time[i];
+              alpha_i[subject[i]] + 
+              gamma_i[subject[i]]*Time[i];
               
     MMSE[i] ~ normal(mu, sigma);
   }
