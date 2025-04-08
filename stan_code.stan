@@ -2,7 +2,7 @@ data {
   int N;
   int S;
   
-  int<lower=1,upper=S> subject[N];
+  int<lower=1> subject[N];
   vector[N] Age;
   vector[N] SES;
   vector[N] EDUC;
