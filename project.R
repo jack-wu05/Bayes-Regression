@@ -31,6 +31,6 @@ fit = stan(
 
 print(fit)
 
-png("traceplot.png")
-traceplot(fit, pars = c("sigma", "delta_1", "beta_Age"))
+pdf("traceplot.pdf")
+traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC"))
 dev.off()
