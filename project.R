@@ -30,3 +30,7 @@ fit = stan(
 )
 
 print(fit)
+
+png("traceplot.png")
+traceplot(fit, pars = c("sigma", "delta_1", "beta_Age"))
+dev.off()

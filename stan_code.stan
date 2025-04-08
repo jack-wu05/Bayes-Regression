@@ -57,3 +57,4 @@ model {
     MMSE[i] ~ normal(mu, sigma);
   }
 }
+
