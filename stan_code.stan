@@ -2,21 +2,23 @@ data {
   int N;
   int S;
   
-  int<lower=1> subject[S];
+  int<lower=1,upper=S> subject[N];
   vector[N] Age;
   vector[N] SES;
   vector[N] EDUC;
   vector[N] Group;
   vector[N] Time;
-  vector[N] MMSE
+  vector[N] MMSE;
 }
 
 parameters {
   real delta_1;
-  real sigma_1;
+  real<lower=0> sigma_1;
+  
+  real<lower=0> sigma;
   
   real delta_2;
-  real sigma_2;
+  real<lower=0> sigma_2;
   
   real beta_Age;
   real beta_SES;
@@ -29,12 +31,12 @@ parameters {
 
 model {
   delta_1 ~ normal(25,15);
-  sigma_1 ~ exponential(1/100);
+  sigma_1 ~ exponential(0.01);
   
   delta_2 ~ normal(1,10);
-  sigma_2 ~ exponential(1/100);
+  sigma_2 ~ exponential(0.01);
   
-  sigma ~ exponential(1/100);
+  sigma ~ exponential(0.01);
   
   beta_Age ~ normal(1,5);
   beta_SES ~ normal(1,5);
@@ -49,9 +51,9 @@ model {
               beta_SES*SES[i] + 
               beta_EDUC*EDUC[i] + 
               beta_Group*Group[i] + 
-              alpha[subject[n]] + 
-              gamma[subject[n]]*Time[n];
+              alpha[subject[i]] + 
+              gamma[subject[i]]*Time[i];
               
-    MMSE[n] ~ normal(mu, sigma);
+    MMSE[i] ~ normal(mu, sigma);
   }
 }
