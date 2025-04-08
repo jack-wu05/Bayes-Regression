@@ -26,11 +26,10 @@ fit = stan(
     Time = data$Visit,
     MMSE = data$MMSE
     ),      
-  iter = 100                 
+  iter = 100
 )
 
 print(fit)
-print(1)
 
 pdf("traceplot.pdf")
 traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC"))
