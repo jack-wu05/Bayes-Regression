@@ -36,23 +36,23 @@ traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC"))
 dev.off()
 
 
-#Run the regression model for a random subject
-library(ggplot2)
 
-posterior = rstan::extract(fit)
+
+
+
+
+
+
+
+library(ggplot2)
 library(dplyr)
 
-library(ggplot2)
-library(dplyr)
-
-# 1. Extract posterior
+## AI-assisted code to generate wrap plot
 posterior <- rstan::extract(fit)
 
-# 2. Get first 30 unique subject indices
 subject_ids <- sort(unique(data$index))
-first_30_ids <- head(subject_ids, 20)
+first_30_ids <- head(subject_ids, 25)
 
-# 3. Build predictions for first 30 subjects
 pred_all <- data.frame()
 
 for (s in first_30_ids) {
@@ -61,11 +61,11 @@ for (s in first_30_ids) {
   
   pred <- sapply(t_grid, function(t)
     posterior$alpha_i[, s] +
-      posterior$gamma_i[, s] * t +
-      posterior$beta_Age * subject$Age[1] +
-      posterior$beta_SES * subject$SES[1] +
-      posterior$beta_EDUC * subject$EDUC[1] +
-      posterior$beta_Group * subject$Group_categorical[1]
+    posterior$gamma_i[, s] * t +
+    posterior$beta_Age * subject$Age[1] +
+    posterior$beta_SES * subject$SES[1] +
+    posterior$beta_EDUC * subject$EDUC[1] +
+    posterior$beta_Group * subject$Group_categorical[1]
   )
   
   pred_df <- data.frame(
@@ -78,11 +78,9 @@ for (s in first_30_ids) {
   
   pred_all <- rbind(pred_all, pred_df)
 }
-
-# 4. Filter original data for just the 30 subjects
 obs_30 <- data[data$index %in% first_30_ids, ]
 
-# 5. Plot with uncertainty ribbon
+pdf("regressions.pdf")
 ggplot(pred_all, aes(x = Time, y = Mean)) +
   geom_ribbon(aes(ymin = Lower, ymax = Upper), fill = "blue", alpha = 0.2) +
   geom_line(color = "blue", size = 0.8) +
@@ -91,3 +89,5 @@ ggplot(pred_all, aes(x = Time, y = Mean)) +
   labs(title = "Predicted MMSE for First 30 Subjects",
        y = "MMSE", x = "Visit") +
   theme_minimal(base_size = 10)
+dev.off()
+
