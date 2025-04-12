@@ -25,23 +25,23 @@ parameters {
   real beta_EDUC;
   real beta_Group;
   
-  vector[S] alpha;
-  vector[S] gamma;
+  vector[S] alpha_i;
+  vector[S] gamma_i;
 }
 
 model {
-  delta_1 ~ normal(25,15);
-  sigma_1 ~ exponential(0.01);
+  delta_1 ~ normal(25,4);
+  sigma_1 ~ exponential(0.1);
   
-  delta_2 ~ normal(1,10);
-  sigma_2 ~ exponential(0.01);
+  delta_2 ~ normal(-1,1);
+  sigma_2 ~ normal(1,0.5);
   
-  sigma ~ exponential(0.01);
+  sigma ~ exponential(0.1);
   
-  beta_Age ~ normal(1,5);
+  beta_Age ~ normal(-0.1,2);
   beta_SES ~ normal(1,5);
-  beta_EDUC ~ normal(1,5);
-  beta_Group ~ normal(1,5);
+  beta_EDUC ~ normal(0.2,2);
+  beta_Group ~ normal(-1,2);
   
   alpha_i ~ normal(delta_1, sigma_1);
   gamma_i ~ normal(delta_2, sigma_2);
