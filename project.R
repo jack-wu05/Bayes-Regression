@@ -32,7 +32,7 @@ fit = stan(
 print(fit)
 
 pdf("traceplot.pdf")
-traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC"))
+traceplot(fit, pars = c("delta_2", "sigma_2", "beta_EDUC", "delta_1"))
 dev.off()
 
 
