@@ -89,5 +89,5 @@ ggplot(pred_all, aes(x = Time, y = Mean)) +
   labs(title = "Predicted MMSE for First 30 Subjects",
        y = "MMSE", x = "Visit") +
   theme_minimal(base_size = 10)
-dev.off()
+dev.off() 
 
