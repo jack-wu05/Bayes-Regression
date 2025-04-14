@@ -88,39 +88,43 @@ dev.off()
 
 
 ## Check for model mis-spec using simulated data
-simulated_data = data.frame(
-  subject = integer(),
-  time = numeric(),
-  Age = numeric(),
-  SES = numeric(),
-  EDUC = numeric(),
-  Group = integer(),
-  MMSE = numeric()
-)
-
+results = list()
 numSubjects = length(unique(data$index))
 
-delta_1 = rnorm(1,0,1);
-sigma_1 = rexp(1,0.5);
-
-delta_2 = rnorm(1,-1,2);
-sigma_2 = rexp(1,0.5);
-
-sigma = rexp(1,0.1);
-
-beta_Age = rnorm(1,-1,3);
-beta_SES = rnorm(1,1,3);
-beta_EDUC = rnorm(1,1,3);
-beta_Group = rnorm(1,-1,3);
-
-alpha_i = rnorm(numSubjects, delta_1,sigma_1)
-gamma_i = rnorm(numSubjects, delta_2,sigma_2)
-Age = rnorm(numSubjects, 70, 5)
-SES = rnorm(numSubjects, 0, 3)
-EDUC = rnorm(numSubjects, 15, 3)
-Group = rbinom(numSubjects, 1, 0.5)
-
-for (i in 1:length(data$index)) {
+for (j in 1:60) {
+  simulated_data = data.frame(
+    subject = integer(),
+    time = numeric(),
+    Age = numeric(),
+    SES = numeric(),
+    EDUC = numeric(),
+    Group = integer(),
+    MMSE = numeric()
+  )
+  
+  for (i in 1:length(data$index)) {
+  delta_1 = rnorm(1,0,1);
+  sigma_1 = rexp(1,0.5);
+  
+  delta_2 = rnorm(1,-1,2);
+  sigma_2 = rexp(1,0.5);
+  
+  sigma = rexp(1,0.1);
+  
+  beta_Age = rnorm(1,-1,3);
+  beta_SES = rnorm(1,1,3);
+  beta_EDUC = rnorm(1,1,3);
+  beta_Group = rnorm(1,-1,3);
+  
+  alpha_i = rnorm(numSubjects, delta_1,sigma_1)
+  gamma_i = rnorm(numSubjects, delta_2,sigma_2)
+  Age = rnorm(numSubjects, 70, 5)
+  SES = rnorm(numSubjects, 0, 3)
+  EDUC = rnorm(numSubjects, 15, 3)
+  Group = rbinom(numSubjects, 1, 0.5)
+  
+  
+  
   visit = data$Visit[i]
   mu = alpha_i[data$index[i]] + gamma_i[data$index[i]]*visit +
        beta_Group*Group[data$index[i]] + beta_EDUC*EDUC[data$index[i]] + 
@@ -130,27 +134,70 @@ for (i in 1:length(data$index)) {
   simulated_data[nrow(simulated_data) + 1, ] = 
     list(subject=data$index[i], time=visit, Age=Age[data$index[i]],
          SES=SES[data$index[i]], EDUC=EDUC[data$index[i]], Group=Group[data$index[i]], MMSE=mmse)
+  }
+  
+  val=sample(1:200, 1)
+  
+  fit = stan(
+    seed = val,
+    file = "stan_code.stan", 
+    data = list (
+      N = nrow(simulated_data),
+      S = length(unique(simulated_data$subject)),
+      
+      subject = simulated_data$subject, 
+      Age = simulated_data$Age,
+      SES = simulated_data$SES,
+      EDUC = simulated_data$EDUC,
+      Group = simulated_data$Group,
+      Time = simulated_data$time,
+      MMSE = simulated_data$MMSE
+    ),
+    iter = 300,
+    warmup = 100,
+    chains = 2
+  )
+  
+  posterior = rstan::extract(fit)
+  ci = quantile(posterior$delta_1, c(0.025, 0.975))
+  delta_1_in_ci = (delta_1 >= ci[1]) & (delta_1 <= ci[2])
+  ci = quantile(posterior$sigma_1, c(0.025, 0.975))
+  sigma_1_in_ci = (sigma_1 >= ci[1]) & (sigma_1 <= ci[2])
+  ci = quantile(posterior$delta_2, c(0.025, 0.975))
+  delta_2_in_ci = (delta_2 >= ci[1]) & (delta_2 <= ci[2])
+  ci = quantile(posterior$sigma_2, c(0.025, 0.975))
+  sigma_2_in_ci = (sigma_2 >= ci[1]) & (sigma_2 <= ci[2])
+  ci = quantile(posterior$sigma, c(0.025, 0.975))
+  sigma_in_ci = (sigma >= ci[1]) & (sigma <= ci[2])
+  
+  ci = quantile(posterior$beta_Age, c(0.025, 0.975))
+  beta_Age_in_ci = (beta_Age >= ci[1]) & (beta_Age <= ci[2])
+  ci = quantile(posterior$beta_SES, c(0.025, 0.975))
+  beta_SES_in_ci = (beta_SES >= ci[1]) & (beta_SES <= ci[2])
+  ci = quantile(posterior$beta_EDUC, c(0.025, 0.975))
+  beta_EDUC_in_ci = (beta_EDUC >= ci[1]) & (beta_EDUC <= ci[2])
+  ci = quantile(posterior$beta_Group, c(0.025, 0.975))
+  beta_Group_in_ci = (beta_Group >= ci[1]) & (beta_Group <= ci[2])
+  
+  coverage_result = list(
+    delta_1 = delta_1_in_ci,
+    sigma_1 = sigma_1_in_ci,
+    delta_2 = delta_2_in_ci,
+    sigma_2 = sigma_2_in_ci,
+    sigma = sigma_in_ci,
+    beta_Age = beta_Age_in_ci,
+    beta_SES = beta_SES_in_ci,
+    beta_EDUC = beta_EDUC_in_ci,
+    beta_Group = beta_Group_in_ci
+  )
+  
+  results[[j]] = coverage_result
 }
 
-fit = stan(
-  seed = 123,
-  file = "stan_code.stan", 
-  data = list (
-    N = nrow(simulated_data),
-    S = length(unique(simulated_data$subject)),
-    
-    subject = simulated_data$subject, 
-    Age = simulated_data$Age,
-    SES = simulated_data$SES,
-    EDUC = simulated_data$EDUC,
-    Group = simulated_data$Group,
-    Time = simulated_data$time,
-    MMSE = simulated_data$MMSE
-  ),      
-  iter = 1000
-)
-
-
+result_df <- do.call(rbind, lapply(results, function(x) unlist(x)))
+coverage <- colMeans(result_df)
+names(coverage) <- sub("\\.2\\.5%$", "", names(coverage))
+coverage
 
 
 
