@@ -26,7 +26,9 @@ fit = stan(
     Time = data$Visit,
     MMSE = data$MMSE
     ),      
-  iter = 1000
+  iter = 10000,
+  warmup = 2000,
+  chains = 5
 )
 
 print(fit)
@@ -91,7 +93,9 @@ dev.off()
 results = list()
 numSubjects = length(unique(data$index))
 
-for (j in 1:60) {
+for (j in 1:250) {
+  print(paste("ITERATION:", j))
+  
   simulated_data = data.frame(
     subject = integer(),
     time = numeric(),
@@ -153,9 +157,9 @@ for (j in 1:60) {
       Time = simulated_data$time,
       MMSE = simulated_data$MMSE
     ),
-    iter = 300,
-    warmup = 100,
-    chains = 2
+    iter = 3000,
+    warmup = 1000,
+    chains = 3
   )
   
   posterior = rstan::extract(fit)
