@@ -1,3 +1,3 @@
 # Bayes-Regression
 
-STAT 447C project repo
+STAT 447C (Bayesian Statistics) project repo
